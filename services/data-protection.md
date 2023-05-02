@@ -1,9 +1,9 @@
 # Data Protection
 
 **Table of contents:**
-    - [Distributed Denial of Service Attacks (DDoS) Mitigation](#ddos-mitigation)
-        - [Cloud Armor](#cloud-armor)
-        - [Cloud Security Scanner](#cloud-security-scanner)
+- [Distributed Denial of Service Attacks (DDoS) Mitigation](#ddos-mitigation)
+    - [Cloud Armor](#cloud-armor)
+    - [Cloud Security Scanner](#cloud-security-scanner)
 
 
 <a id="ddos-mitigation"></a>
