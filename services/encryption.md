@@ -8,7 +8,15 @@
     - [Key Management](#key-management)
     - [Crypto Library](#crypto-library)
     - [CSEK](#csek)
-- [Encryption in Transit](#encryption-in-transit)
+- [Encryption in Transit](#encryption-in-transit-overview)
+    - [Physical Boundary](#phyical-boundary)
+    - [Traffic Routing](#traffic-routing)
+    - [Encryption in Transit](#encryption-in-transit)
+        - [Method of Encryption](#methods-of-encryption)
+- [Cloud KMS](#cloud-kms)
+    - [Keys, key versions and key rings](#keys-keyversions)
+    - [Key Hiearchy](#key-hierarchy)
+    - [Key Version State](#key-version-state)
 
 
 <a id="encryption"></a>
@@ -81,7 +89,7 @@ Customer can use existing encryption keys that they manage with the GCP in combi
 - Manage encryption of cloud-hosted data the same way as currently do on-prem.
 
 
-<a id="encryption-in-transit"></a>
+<a id="encryption-in-transit-overview"></a>
 # [Encryption in Transit](https://cloud.google.com/docs/security/encryption-in-transit)
 
 Encryption in transit protects your data if communications are intercepted while data moves between your site and the cloud provider or between two services.
@@ -146,3 +154,49 @@ Figure 3:
     - GFE to service / service to service
     ![](https://cloud.google.com/static/images/security/alts-handshake.png)
 
+<a id="cloud-kms"></a>
+# [Cloud Key Management Service Overview](https://cloud.google.com/docs/security/key-management-deep-dive)
+
+The Cloud KMS platform lets Google Cloud customers manage cryptographic keys in a central cloud service for either direct use or use by other cloud resources and applications.
+
+- The Cloud KMS software backend gives you the flexibility to encrypt your data with either a symmetric or asymmetric key that you control
+- If you need a hardware key, you can use Cloud HSM to help ensure that your symmetric and asymmetric keys are only used in FIPS 140-2 Level 3
+- Cloud KMS lets you import your own cryptographic keys in case you need to use keys that you generate yourself.
+
+<a id="keys-keyversions"></a>
+## Keys, key versions and key rings
+
+![](https://cloud.google.com/static/docs/security/key-management-deep-dive/images/kms-key-groupings.png)
+
+* Key - A named object representing a cryptographic key that is used for a specific purpose. Key purpose and other attributes of the key are connected with and managed using the key. Thus, the key is the most important object for understanding KMS usage.
+* Key ring: A grouping of keys for organizational purposes. A key ring belongs to a Google Cloud project and resides in a specific location. To prevent resource name collisions, a key ring cannot be deleted. Key rings and keys do not have billable costs or quota limitations
+* Key metadata: Resource names, properties of KMS resources such as IAM policies, key type, key size, key state, and any data derived from the above. Key metadata can be managed differently than the key material.
+* Key version: Represents the key material associated with a key at some point in time. The key version is the resource that contains the actual key material. Versions are numbered sequentially, beginning with version 1. When a key is rotated, a new key version is created with new key material.
+
+<a id="key-hierarchy"></a>
+## Key Hierarchy
+
+![](https://cloud.google.com/static/docs/security/key-management-deep-dive/images/kms-internal-key-hierarchy.png)
+
+*    Data encryption key (DEK): A key used to encrypt data.
+*    Key encryption key (KEK): A key used to encrypt, or wrap, a data encryption key. All Cloud KMS platform options (software, hardware, and external backends) let you control the key encryption key.
+*    KMS Master Key: The key used to encrypt the key encryption keys (KEK). This key is distributed in memory. The KMS Master Key is backed up on hardware devices. This key is responsible for encrypting your keys.
+*    Root KMS: Google's internal key management service.
+
+<a id="key-version-state"></a>
+## Key version has a state
+- Pending genderation
+    - Being generated
+    - Asymmetric keys only
+- Enabled
+- Disabled
+    - Can be put back to `Enabled` state
+- Scheduled for destruction
+    - Can be put back into the `Disabled` state
+- Destroyed
+- Symmetric encryption
+    - Primary key version to be enabled for cryption
+- Asmmetric encryption
+    - Key version to be enabled for encryption or digitial signing
+
+![](https://jayendrapatil.com/wp-content/uploads/2021/05/Google-Cloud-KMS-Key-States.png)
